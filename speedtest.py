@@ -2,6 +2,8 @@ import os
 from subprocess import run
 from  openpyxl import load_workbook, workbook
 from datetime import datetime
+from plyer import notification
+
 
 raw_output = run(['cmd', '/C', os.path.join(os.path.dirname(__file__), 'speedtest.exe')], shell=True, capture_output=True)
 parse_output = raw_output.stdout
@@ -14,6 +16,7 @@ new_row = last_row + 1
 
 extra = [b'Latency', b'Download', b'Upload', b'Packet Loss',b'Result URL']
 spo = [split_parse_output[line].lstrip().rstrip().split(b':') for line in range(3,10)]
+print(spo)
 spo1 = []
 for item in spo:
     for title in extra:
@@ -45,3 +48,7 @@ for column in wb.active.iter_rows(min_row=new_row, max_col=11, max_row=new_row):
         except:pass
 
 wb.save(filename=dest_filename)
+notification.notify(
+    title='Speedtest Results',
+    message='{} - {}'.format(b''.join(spo[3]).decode(), b''.join(spo[4]).decode()),
+    timeout=600,)
